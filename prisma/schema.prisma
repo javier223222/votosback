@@ -1,0 +1,174 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+
+model admin{
+  id Int @id @default(autoincrement())
+  username String @unique
+  nombre String
+  apellido String
+  password String
+  role role @relation(fields: [idrole], references: [idrole])
+  idrole Int
+  email String @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime ? @updatedAt
+
+}
+model role{
+  idrole Int @id @default(autoincrement())
+  name String @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime ? @updatedAt
+  admin admin[]
+
+}
+
+
+model usuario {
+  idusuario Int @id @default(autoincrement())
+
+  nombre String
+
+  apellido String
+  email String @unique
+  password String
+  isDeleted Boolean @default(false)
+  deletedAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime ? @updatedAt
+  imgUsuario imgUsuario[]
+  votes votes[]
+
+}
+
+model imgUsuario{
+  idimgUsuario Int @id @default(autoincrement())
+  idusuario Int
+  url String
+  usuario usuario @relation(fields: [idusuario], references: [idusuario])
+  isDeleted Boolean @default(false)
+  deletedAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime ? @updatedAt
+
+}
+
+
+
+model votacion{
+
+  idvotacion Int @id @default(autoincrement())
+  nombre String
+  descripcion String
+
+  fechaInicio DateTime
+  fechaFin DateTime
+  isDeleted Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime ? @updatedAt
+  deletedAt DateTime?
+  candidatoOfVotation candidatoOfVotation[]
+
+  imgVotacion imgVotacion[]
+  votes votes[]
+  winner winner[]
+}
+
+model imgVotacion{
+  idimgVotacion Int @id @default(autoincrement())
+  idvotacion Int
+  url String
+  votacion votacion @relation(fields: [idvotacion], references: [idvotacion])
+  isDeleted Boolean @default(false)
+  deletedAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime ? @updatedAt
+
+}
+
+model candidatoOfVotation{
+  idcandidatoOfVotation Int @id @default(autoincrement())
+  idcandidato Int
+  idvotacion Int
+  votacion votacion @relation(fields: [idvotacion], references: [idvotacion])
+  candidato candidato @relation(fields: [idcandidato], references: [idcandidato])
+  
+  isDeleted Boolean @default(false)
+  deletedAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime ? @updatedAt
+}
+
+
+
+model candidato{
+  idcandidato Int @id @default(autoincrement())
+  nombre String
+  apellido String
+  isDeleted Boolean @default(false)
+  deletedAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime ? @updatedAt
+  candidatoOfVotation candidatoOfVotation[]
+  imgCandidate imgCandidate[]
+  
+  votes votes[]
+
+  candidateWinner winner[]
+
+}
+
+model imgCandidate{
+  idimgCandidate Int @id @default(autoincrement())
+  idcandidato Int
+  url String
+  candidato candidato @relation(fields: [idcandidato], references: [idcandidato])
+  isDeleted Boolean @default(false)
+  deletedAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime ? @updatedAt
+
+}
+
+model votes{
+  idvotes Int @id @default(autoincrement())
+  idcandidato Int
+  idvotation Int
+  idusuario Int
+  candidato candidato @relation(fields: [idcandidato], references: [idcandidato])
+  usuario usuario @relation(fields: [idusuario], references: [idusuario])
+  votacion votacion @relation(fields: [idvotation], references: [idvotacion])
+  isDeleted Boolean @default(false)
+  deletedAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime ? @updatedAt
+
+}
+
+model winner{
+  idwinner Int @id @default(autoincrement())
+  idcandidato Int
+  idvotacion Int
+  votacion votacion @relation(fields: [idvotacion], references: [idvotacion])
+  candidato candidato @relation(fields: [idcandidato], references: [idcandidato])
+  isDeleted Boolean @default(false)
+  deletedAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime ? @updatedAt
+
+}
+
+
