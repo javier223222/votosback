@@ -2,7 +2,7 @@ import IVotes from "../interfaces/IVotes";
 import IVotesOrm from "../interfaces/IVotesOrm";
 import { db } from "../repositories/mysql.repo";
 
-export default class VotesOrm implements IVotesOrm{
+export default class VotesOrm {
     public async create(vote: IVotes): Promise<any> {
         try{
            const result=await db.votes.create({
@@ -37,15 +37,15 @@ export default class VotesOrm implements IVotesOrm{
         }
     }
 
-    public async get(id: number): Promise<any> {
+    public async get(id: number,idcandidato:number): Promise<any> {
         try{
-            const result=await db.votes.findMany({
+        
+            const result=await db.votes.count({
                 where:{
-                  idvotation:id
+                  idvotation:id,
+                  idcandidato:idcandidato
                 },
-                orderBy:{
-                    idcandidato:"desc"
-                }
+               
             })
             return result;
           
@@ -79,7 +79,7 @@ export default class VotesOrm implements IVotesOrm{
             throw new Error(e.message)
         }
     }
-    public async find(idvotacion: number, iduser: number): Promise<any> {
+    public async find(idvotacion: number, iduser: number): Promise<any[]> {
         try{
            
             const result = await db.votes.findMany({

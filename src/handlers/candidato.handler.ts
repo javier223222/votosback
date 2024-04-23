@@ -15,18 +15,41 @@ export default (io:any,socket:any)=>{
           idCandidato:result?.id?result.id:0
         })
         const votacionorm=new VotacionOrm()
+        const votosofcandiorm=new VotesOrm()
         const votacion=await votacionorm.get(parseInt(id))
-        io.of("/votaciones").to(id).emit("candidato:get",votacion)
-        io.of("/user/votaciones").to(id).emit("candidato:get",votacion)
+        const candidatos=votacion.candidatoOfVotation
+        for (let i = 0; i < candidatos.length; i++) {
+            const candidato = candidatos[i];
+            let totalvotos=await votosofcandiorm.get(parseInt(id),candidato.candidato.idcandidato)
+            candidato.votos=totalvotos
+            
+        }
+        io.of("/votaciones").to(id).emit("candidato:get",candidatos)
+        io.of("/user/votaciones").to(id).emit("candidato:get",candidatos)
 
     }
-    socket.on("candidato:create",addcandidato)
-    socket.on("joinRoom",async(idRoom:any) => {
-        console.log("joinRoom",idRoom)
+
+    const joinnewroom=async(data:any)=>{
+        console.log("joinRoom",data.idvotes)
         const votosofcandiorm=new VotesOrm()
-        const votos=await votosofcandiorm.get(parseInt(idRoom))
-        console.log(votos)
-        socket.join(idRoom)
+        const votacionorm=new VotacionOrm()
         
-     })
+        const votacion=await votacionorm.get(parseInt(data.idvotes))
+     
+        const candidatos=votacion.candidatoOfVotation
+        for (let i = 0; i < candidatos.length; i++) {
+            const candidato = candidatos[i];
+            let totalvotos=await votosofcandiorm.get(parseInt(data.idvotes),candidato.candidato.idcandidato)
+            candidato.votos=totalvotos
+            
+        }
+      
+        socket.join(data.idvotes)
+        io.of("/votaciones").to(data.idvotes).emit("candidato:get",candidatos)
+        io.of("/user/votaciones").to(data.idvotes).emit("candidato:get",candidatos)
+        
+        
+    }
+    socket.on("candidato:create",addcandidato)
+    socket.on("joinRoom",joinnewroom)
 }

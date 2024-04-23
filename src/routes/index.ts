@@ -9,7 +9,8 @@ import { verifytokenadminandclient } from "../middlewares/http"
 let root:Express=express()
 root.use("/admin/auth",authrouter)
 root.use("/user/auth",authuser)
-root.use("/votacion",verifyToken,votacionrouter)
+root.use("/votacion",votacionrouter)
+
 
 
 export default root
